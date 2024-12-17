@@ -1,0 +1,351 @@
+    @import url("https://fonts/googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap");
+
+
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Poppins", sans-serif;
+    }
+
+
+    body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        background: url('background.png') no-repeat;
+        background-size: cover;
+        background-position: center;
+
+    }
+
+    #verificationMessage {
+        color: #b22222;
+        font-size: 14px;
+        font-weight: bold;
+        margin-top: 10px;
+        text-align: center;
+        text-shadow:
+            0.5px 0.5px 0 rgb(174, 174, 174),
+            /* Bottom-right */
+            -0.5px -0.5px 0 rgb(174, 174, 174),
+            /* Top-left */
+            -0.5px 0.5px 0 rgb(174, 174, 174),
+            /* Bottom-left */
+            0.5px -0.5px 0 rgb(174, 174, 174);
+    }
+
+    .wrapper {
+        width: 420px;
+        background: transparent;
+        border: 2px solid rgba(0, 0, 0, 0.2);
+        backdrop-filter: blur(20px);
+        box-shadow: 0 0 10px rgba(0, 0, 0, rgba(255, 255, 255, .2));
+        color: firebrick;
+        border-radius: 10px;
+        padding: 30px 40px;
+    }
+
+    .wrapper h1 {
+        font-size: 36px;
+        text-align: center;
+    }
+
+    .wrapper .input-box {
+        position: relative;
+        width: 100%;
+        height: 50px;
+        margin: 30px 0;
+    }
+
+    .input-box input {
+        width: 100%;
+        height: 100%;
+        background: transparent;
+        border: none;
+        outline: none;
+        border: 2px solid rgba(255, 255, 255, .2);
+        border-radius: 40px;
+        font-size: 16px;
+        color: #fff;
+        padding: 20px 45px 20px 20px;
+    }
+
+    .input-box input::placeholder {
+        color: #fff;
+    }
+
+    .input-box i {
+        position: absolute;
+        right: 20px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 20px;
+    }
+
+    /* Confirm pass*/
+    .wrapper .input-box2 {
+        position: relative;
+        width: 100%;
+        height: 50px;
+        margin: 30px 0;
+    }
+
+    .input-box2 input {
+        width: 100%;
+        height: 100%;
+        background: transparent;
+        border: none;
+        outline: none;
+        border: 2px solid rgba(255, 255, 255, .2);
+        border-radius: 40px;
+        font-size: 16px;
+        color: #fff;
+        padding: 20px 45px 20px 20px;
+    }
+
+    .input-box2 input::placeholder {
+        color: #fff;
+    }
+
+    .input-box2 i {
+        position: absolute;
+        right: 20px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 20px;
+    }
+
+    /* Window popup section
+    */
+    /* Container for both icon and message */
+    .popup-message-container {
+        display: flex;
+        justify-content: center;
+        /* Center both icon and message */
+        align-items: center;
+        /* Vertically center the content */
+        width: 100%;
+        color: #fff;
+    }
+
+    /* Success text (bold and centered) */
+    .popup-bold-center {
+        display: block;
+        text-align: center;
+        /* Center the text */
+        font-weight: bold;
+        font-size: 20px;
+        margin-bottom: 3px;
+        color: #fff;
+    }
+
+    /* Success Message */
+    .popup-message-success {
+        font-size: 16px;
+        line-height: 1.5;
+        color: white;
+        margin-left: 10px;
+        /* Space between icon and text */
+        text-align: center;
+        /* Ensure text is centered */
+        color: #fff;
+    }
+
+    /* Error Message */
+    .popup-message-error {
+        font-size: 16px;
+        line-height: 1.5;
+        color: #fff;
+        margin-left: 10px;
+        /* Space between icon and text */
+    }
+
+    /* Success Popup */
+    #popup-success {
+        background-color: #4CAF50;
+        /* Green background for success */
+    }
+
+    /* Error Popup */
+    #popup-error {
+        background-color: #f44336;
+        /* Red background for error */
+    }
+
+    /* Icon styling */
+    .popup-message-container i {
+        font-size: 44px;
+        /* Icon size */
+        color: white;
+        /* Icon color */
+        margin-right: 10px;
+    }
+
+    /* Popup common properties */
+    .popup {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        padding: 15px;
+        border-radius: 5px;
+        font-size: 0.9em;
+        z-index: 1000;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        opacity: 0;
+        transform: translateY(20px);
+        transition: opacity 0.3s ease, transform 0.3s ease;
+        max-width: 300px;
+    }
+
+    .popup.visible {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    .popup.hidden {
+        opacity: 0;
+        transform: translateY(20px);
+        pointer-events: none;
+    }
+
+    /* Close button styling */
+    .close-button {
+        background: none;
+        border: none;
+        color: white;
+        font-size: 1.5em;
+        cursor: pointer;
+        padding: 0;
+        margin: 0;
+        position: absolute;
+        top: 5px;
+        right: 10px;
+        line-height: 1;
+    }
+
+
+    /* Adjust icon size for error message */
+    .error-icon {
+        font-size: 40px;
+        /* Adjust icon size for better visibility */
+        color: white;
+        /* Set icon color to white */
+        margin-right: 15px;
+        /* Space between icon and text */
+    }
+
+    #popup-error .popup-message-container {
+        display: flex;
+        justify-content: center;
+        text-align: center;
+        /* Center both icon and message */
+        align-items: center;
+        color: #fff;
+        /* Vertically center the content */
+    }
+
+    /* Styling for error message */
+    #popup-error .popup-message-error {
+        color: white;
+        font-size: 16px;
+        font-weight: bold;
+        text-align: center;
+        margin-left: 10px;
+        color: #fff;
+        /* Space between icon and message */
+    }
+
+
+
+
+
+
+    .wrapper .btn:hover {
+        background-color: #960000;
+        color: #fff;
+    }
+
+    .wrapper .remember-forgot {
+        display: flex;
+        justify-content: space-between;
+        font-size: 14.5px;
+        color: #fff;
+        margin: -15px 0 15px;
+    }
+
+    .remember-forgot label input {
+        accent-color: #fff;
+        margin-right: 3px;
+    }
+
+    .remember-forgot a {
+        color: #fff;
+        text-decoration: none;
+    }
+
+    .remember-forgot a:hover {
+        text-decoration: underline;
+        color: red;
+    }
+
+    .wrapper .btn {
+        width: 100%;
+        height: 45px;
+        background: #fff;
+        border: none;
+        outline: none;
+        border-radius: 40px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, -1);
+        cursor: pointer;
+        font-size: 16px;
+        color: #333;
+        font-weight: 600;
+    }
+
+    .wrapper .register-link {
+        font-size: 14.5px;
+        text-align: center;
+        margin-top: 20px;
+        color: #fff;
+
+
+    }
+
+    .register-link p a {
+        color: #fff;
+        text-decoration: none;
+        font-weight: 600;
+
+    }
+
+    .register-link p a:hover {
+        text-decoration: underline;
+        color: red;
+    }
+
+        /* Container styling */
+        .container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Search Input */
+        #searchInput {
+            border-radius: 5px;
+        }
+        
+        /* Table Styling */
+        .table thead th {
+            background-color: #7d2828;  /* Dark header background */
+            color: #fff;  /* White text */
+        }
+        
+        .table tbody tr:hover {
+            background-color: #f1f1f1;  /* Hover effect for table rows */
+        }

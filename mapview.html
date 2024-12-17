@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PinCrime - Map</title>
+    <link rel="icon" type="image/png" href="/assets/images/logonoback.png">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="./assets/css/style.css">
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@4.3.0/fonts/remixicon.css" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui@4/dist/fancybox.css" />
+    <link rel="stylesheet" href="https://unpkg.com/aos@next/dist/aos.css" />
+    <style>
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: Arial, sans-serif;
+        }
+
+
+        #map {
+            height: 80%;
+        }
+
+        #info {
+            padding: 10px;
+            font-family: Arial, sans-serif;
+            text-align: center;
+            font-size: 15px;
+            /* Adjusted font size */
+            background-color: transparent;
+            /* Removed background color */
+        }
+
+        #search-container {
+            position: fixed;
+            top: 150px;
+            /* Adjusted to make it lower */
+            left: 50px;
+            /* Align it to the left */
+            padding: 10px;
+            font-family: Arial, sans-serif;
+            width: 15%;
+            /* Adjust the width as needed */
+            z-index: 1000;
+            background-color: transparent;
+            /* Removed the white background */
+        }
+
+        #search-bar {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            /* Added border for the search bar */
+        }
+
+
+
+
+
+        .floating-button-container {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 10px;
+            z-index: 1000;
+        }
+
+        .floating-button {
+            padding: 10px 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            width: 150px;
+            text-align: center;
+        }
+
+        #remove-crime-button {
+            background-color: #dc3545;
+        }
+
+        #location-button {
+            background-color: #007bff;
+        }
+
+        /* Floating Sidebar Style */
+        #sidebar {
+            position: fixed;
+            top: 21%;
+            right: 10px;
+            width: 300px;
+            height: 78%;
+            background-color: #f9f9f9;
+            border-left: 2px solid #ccc;
+            padding: 20px;
+            overflow-y: auto;
+            display: none;
+            /* Initially hidden */
+            z-index: 1000;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: right 0.3s ease;
+        }
+
+        #sidebar.open {
+            display: block;
+        }
+
+        #sidebar h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        #crime-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        #crime-list li {
+            margin-bottom: 15px;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #fff;
+        }
+
+        #close-sidebar {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #FF0000;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            font-size: 14px;
+            border-radius: 5px;
+        }
+
+        #close-sidebar:hover {
+            background-color: #ddd;
+            border-radius: 50%;
+        }
+    </style>
+
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-control-search@1.1.0/dist/leaflet-control-search.css" />
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg bg-white sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">
+                <img src="/assets/images/pincrimelogo.png" width="150" height="150">
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <div class="navbar-nav d-flex w-100 mx-auto">
+                    <ul class="navbar-nav mx-auto">
+                        <li class="nav-item">
+                            <a class="nav-link" href="index.html">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="contact_page.html">Contacts</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="http://127.0.0.1:8050/">Dashboard</a>
+                        </li>
+                    </ul>
+                    <a href="login.html" class="btn btn-brand">Log Out</a>
+                </div>
+            </div>
+
+        </div>
+    </nav>
+
+    <h1 id="info">Click the button to get your coordinates and see your location with nearby crime data on the map.</h1>
+
+    <!-- Floating Buttons -->
+    <div class="floating-button-container">
+        <button class="floating-button" onclick="getLocation()">Show Near By Incidents</button>
+        <button class="floating-button" id="location-button" onclick="chooseLocation()">Choose Location</button>
+        <button class="floating-button" id="show-all-button" onclick="showAllCrimes()">Show All Incidents</button>
+        <button class="floating-button" id="remove-crime-button" onclick="removeCrimeMarkers()">Clear Incidents
+            Pinpoint</button>
+    </div>
+
+    <!-- Search and Filter Container -->
+    <div id="search-container">
+        <input type="text" id="search-bar" placeholder="Search" oninput="filterData()" />
+    </div>
+
+    <!-- Floating Sidebar -->
+    <div id="sidebar">
+        <button id="close-sidebar" onclick="closeSidebar()">x</button>
+        <h3>Nearby Crimes</h3>
+        <ul id="crime-list"></ul>
+    </div>
+
+    <div id="map"></div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-control-search@1.1.0/dist/leaflet-control-search.js"></script>
+    <script>
+        let map, userMarker, chosenMarker, crimeDataLayer, filteredCrimeData = [];
+        const proximityRadius = 1000; // Show crimes within 1 km (1000 meters)
+        let crimeMarkers = []; // Array to store crime markers for removal
+
+        const categoryIcons = {
+            "Theft": "assets/images/theft.png",
+            "Violence": "assets/images/assault.png",
+            "Traffic": "assets/images/traffic.png",
+            "Fraud": "assets/images/fraud.png",
+            "Vandalism": "assets/images/vandalism.png",
+            "Operation": "assets/images/operation.png",
+            "Miscellaneous": "assets/images/operation.png"
+        };
+        // Function to initialize the map centered on Calabarzon region
+        function initializeMap() {
+            const philippinesLat = 12.8797;  // Latitude of the center of the Philippines
+            const philippinesLon = 121.7740; // Longitude of the center of the Philippines
+            map = L.map('map').setView([philippinesLat, philippinesLon], 6); // Zoom level adjusted to show the entire Philippines
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                maxZoom: 19,
+            }).addTo(map);
+        }
+
+
+        function getLocation() {
+            const info = document.getElementById("info");
+
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(showPosition, showError, {
+                    enableHighAccuracy: true
+                });
+            } else {
+                info.innerHTML = "Geolocation is not supported by this browser.";
+            }
+        }
+
+        function showPosition(position) {
+            const lat = position.coords.latitude;
+            const lon = position.coords.longitude;
+            const info = document.getElementById("info");
+
+            // Fetch the address using Nominatim API
+            fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`)
+                .then(response => response.json())
+                .then(data => {
+                    const address = data.display_name;
+                    info.innerHTML = `User Latitude: ${lat.toFixed(6)}, Longitude: ${lon.toFixed(6)}<br>Address: ${address}`;
+                })
+                .catch(err => {
+                    info.innerHTML = `User Latitude: ${lat.toFixed(6)}, Longitude: ${lon.toFixed(6)}<br>Address: Not available`;
+                });
+
+            if (!map) {
+                initializeMap(); // Initialize map centered on Calabarzon
+            }
+
+            if (userMarker) {
+                userMarker.setLatLng([lat, lon]);
+            } else {
+                userMarker = L.marker([lat, lon]).addTo(map);
+                userMarker.bindPopup("You are here!").openPopup();
+                document.getElementById("sidebar").classList.add("open");
+            }
+
+            if (chosenMarker) {
+                map.removeLayer(chosenMarker);
+            }
+
+            if (map.getCenter().lat !== lat || map.getCenter().lng !== lon) {
+                map.setView([lat, lon], 13);
+            }
+
+            // Fetch the crime data and show nearby crimes
+            fetch('crime_data.geojson')
+                .then(response => response.json())
+                .then(data => {
+                    filteredCrimeData = data.features;
+                    showNearbyCrimes(lat, lon);
+                })
+                .catch(error => {
+                    info.innerHTML = "Error loading crime data: " + error;
+                });
+        }
+
+
+        function chooseLocation() {
+            const info = document.getElementById("info");
+            const lat = map.getCenter().lat;
+            const lon = map.getCenter().lng;
+
+            // Fetch the address using Nominatim API
+            fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`)
+                .then(response => response.json())
+                .then(data => {
+                    const address = data.display_name;
+                    info.innerHTML = `Chosen Location Latitude: ${lat.toFixed(6)}, Longitude: ${lon.toFixed(6)}<br>Address: ${address}`;
+                })
+                .catch(err => {
+                    info.innerHTML = `Chosen Location Latitude: ${lat.toFixed(6)}, Longitude: ${lon.toFixed(6)}<br>Address: Not available`;
+                });
+
+            // Remove previous chosen marker if exists
+            if (chosenMarker) {
+                map.removeLayer(chosenMarker);
+            }
+
+            // Add a new marker for the chosen location
+            chosenMarker = L.marker([lat, lon]).addTo(map);
+            chosenMarker.bindPopup("Chosen Location").openPopup();
+
+            // Center the map at the chosen location
+            map.setView([lat, lon], 13);
+
+            // Show the sidebar
+            document.getElementById("sidebar").classList.add("open");
+
+            // Show nearby crimes for the chosen location
+            showNearbyCrimes(lat, lon);
+        }
+
+
+        function showNearbyCrimes(lat, lon) {
+            const sidebar = document.getElementById("sidebar");
+            const crimeList = document.getElementById("crime-list");
+
+            const nearbyCrimes = filteredCrimeData.filter(feature => {
+                const crimeLat = feature.geometry.coordinates[1];
+                const crimeLon = feature.geometry.coordinates[0];
+                const crimeLocation = L.latLng(crimeLat, crimeLon);
+                const userLocation = L.latLng(lat, lon);
+                return userLocation.distanceTo(crimeLocation) <= proximityRadius;
+            });
+
+            removeCrimeMarkers(); // Clear previous markers
+
+            crimeList.innerHTML = ""; // Clear previous sidebar entries
+
+            nearbyCrimes.forEach(feature => {
+                const category = getCrimeCategory(feature.properties.incident_type);
+
+                // Add marker to the map
+                const icon = L.icon({
+                    iconUrl: categoryIcons[category] || categoryIcons["Miscellaneous"],
+                    iconSize: [30, 30]
+                });
+
+                const crimeInfo = `
+                    <strong>Station:</strong> ${feature.properties.station}<br>
+                    <strong>Province:</strong> ${feature.properties.province}<br>
+                    <strong>City:</strong> ${feature.properties.city}<br>
+                    <strong>Barangay:</strong> ${feature.properties.barangay}<br>
+                    <strong>Incident Type:</strong> ${feature.properties["incident_type"]}<br>
+                `;
+
+                const marker = L.marker([feature.geometry.coordinates[1], feature.geometry.coordinates[0]], {
+                    icon: icon
+                }).bindPopup(crimeInfo).addTo(map);
+
+                crimeMarkers.push(marker); // Add marker to array
+
+                // Add crime info to the sidebar
+                const listItem = document.createElement("li");
+                listItem.innerHTML = `
+                    <strong>Type:</strong> ${feature.properties["incident_type"]}<br>
+                    <strong>City:</strong> ${feature.properties.city}<br>
+                    <strong>Barangay:</strong> ${feature.properties.barangay}
+                `;
+                crimeList.appendChild(listItem);
+            });
+        }
+
+        function showAllCrimes() {
+            removeCrimeMarkers();
+
+            L.geoJSON(filteredCrimeData, {
+                onEachFeature: function (feature, layer) {
+                    const category = getCrimeCategory(feature.properties.incident_type);
+
+                    const icon = L.icon({
+                        iconUrl: categoryIcons[category] || categoryIcons["Miscellaneous"],
+                        iconSize: [30, 30]
+                    });
+
+                    const crimeInfo = `
+                    <strong>Crime Information:</strong><br>
+                    <strong>Station:</strong> ${feature.properties.station}<br>
+                    <strong>Province:</strong> ${feature.properties.province}<br>
+                    <strong>City:</strong> ${feature.properties.city}<br>
+                    <strong>Barangay:</strong> ${feature.properties.barangay}<br>
+                    <strong>Incident Type:</strong> ${feature.properties["incident_type"]}<br>
+                    <strong>Latitude:</strong> ${feature.geometry.coordinates[1].toFixed(6)}<br>
+                    <strong>Longitude:</strong> ${feature.geometry.coordinates[0].toFixed(6)}
+                `;
+                    layer.setIcon(icon).bindPopup(crimeInfo).addTo(map);
+                    crimeMarkers.push(layer); // Add marker to array
+                }
+            });
+        }
+
+        function removeCrimeMarkers() {
+            crimeMarkers.forEach(marker => map.removeLayer(marker));
+            crimeMarkers = []; // Clear the array after removal
+        }
+
+        function filterData() {
+            const searchQuery = document.getElementById("search-bar").value.toLowerCase();
+            filteredCrimeData = filteredCrimeData.filter(feature => {
+                return feature.properties.incident_type.toLowerCase().includes(searchQuery) ||
+                    feature.properties.station.toLowerCase().includes(searchQuery) ||
+                    feature.properties.province.toLowerCase().includes(searchQuery) ||
+                    feature.properties.city.toLowerCase().includes(searchQuery) ||
+                    feature.properties.barangay.toLowerCase().includes(searchQuery);
+            });
+            showNearbyCrimes(map.getCenter().lat, map.getCenter().lng);
+        }
+
+        function getCrimeCategory(incidentType) {
+            const categories = {
+                "Theft": ["(Incident) Robbery", "(Incident) Cellphone Snatching", "(Incident) Carnapping/Motornapping", "(Incident) Theft"],
+                "Violence": ["(Incident) Stray Bullet", "(Incident) Mauling", "(Incident) Stabbing", "(Incident) Shooting", "(Incident) Assault"],
+                "Traffic": ["(Incident) Vehicular Accident"],
+                "Fraud": ["(Incident) Swindling/Estafa"],
+                "Vandalism": ["(Incident) Malicious Mischief"],
+                "Operation": ["(Operation) Buy Bust"],
+                "Miscellaneous": ["(Incident) Other Threats"]
+            };
+
+            for (let category in categories) {
+                if (categories[category].includes(incidentType)) {
+                    return category;
+                }
+            }
+            return "Miscellaneous";
+        }
+
+        function closeSidebar() {
+            document.getElementById("sidebar").classList.remove("open");
+        }
+
+        function showError(error) {
+            const info = document.getElementById("info");
+            switch (error.code) {
+                case error.PERMISSION_DENIED:
+                    info.innerHTML = "User denied the request for Geolocation.";
+                    break;
+                case error.POSITION_UNAVAILABLE:
+                    info.innerHTML = "Location information is unavailable.";
+                    break;
+                case error.TIMEOUT:
+                    info.innerHTML = "The request to get user location timed out.";
+                    break;
+                default:
+                    info.innerHTML = "An unknown error occurred.";
+            }
+        }
+        initializeMap();
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

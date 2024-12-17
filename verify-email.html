@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Verification</title>
+    <link rel="stylesheet" href="style.css">
+    <script type="module" defer src="verify-email.js"></script>
+</head>
+
+<body>
+    <div class="wrapper">
+        <h1>Verify Your Email</h1>
+        <p>Please check your email for a verification link and click on it to verify your account. After verification, you will be redirected to the main page.</p>
+
+        <!-- This prompt is visible only when email is not verified -->
+        <div id="verificationPrompt" style="display:none;">
+            <p>Please verify your email before proceeding. If you haven't received the email, click below to resend it.</p>
+            <button id="resend" class="btn">Resend Verification Email</button>
+        </div>
+    </div>
+
+    <!-- Popup error container -->
+    <div id="popup-error" class="popup hidden">
+        <div class="popup-message-container">
+            <i class='bx bx-error-circle'></i>
+            <button id="popup-close-error" class="close-button" type="button">&times;</button>
+            <p id="popup-message-error"></p>
+        </div>
+    </div>
+
+    <style>
+        .popup {
+            position: fixed;
+            top: 20%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1000;
+            padding: 20px;
+            background: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            display: none;
+        }
+
+        .popup.visible {
+            display: block;
+        }
+
+        .popup.hidden {
+            display: none;
+        }
+
+        .popup-message-container {
+            text-align: center;
+        }
+
+        .popup-bold-center {
+            font-weight: bold;
+        }
+
+        .close-button {
+            border: none;
+            background: none;
+            font-size: 18px;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            cursor: pointer;
+        }
+    </style>
+</body>
+
+</html>
